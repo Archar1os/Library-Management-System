@@ -55,23 +55,5 @@ public class pLabExam
             Principal_Amount += interest;
 
         }
-    }
-    public static void ComputeSalary(double HourlyPay, double HoursWorked)
-    {
-        double HoursRate = 0;
-        
-        if (HoursWorked >= 40)
-        {
-            HoursRate = (HoursWorked - 40) * 1.5;
-            HoursWorked = 40;
-        }
-        double RegularSalary = HourlyPay * HoursWorked;
-        System.out.println("Regular Salary: Php " + String.format("%,.2f",RegularSalary));
-
-        double OvertimePay = HoursRate * HourlyPay;
-        System.out.println("Overtime Pay:   Php   " + String.format("%,.2f",OvertimePay));
-
-        double WeeklySalary = RegularSalary + OvertimePay;
-        System.out.println("Weekly Salary:  Php " + String.format("%,.2f",WeeklySalary));
-    }
+    
 }
