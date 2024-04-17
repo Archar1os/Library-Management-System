@@ -26,11 +26,13 @@ public class Main
         }
         else if (user == 4)
         {
-            System.out.println("ok4");
+            System.out.println("Thank you for visiting the library.");
+            break
         }
         else
         {
             System.out.println("error");
         }
+        scanner.close();
     }
 }
