@@ -3,93 +3,94 @@ import java.util.*;
 class Book {
     String title;
     String author;
-    int BookNum;
+    int bookNum;
+    Borrower borrower;
 
-    public Book(String title, String author, int BookNum) {
+    public Book(String title, String author, int bookNum, Borrower borrower) {
         this.title = title;
         this.author = author;
-        this.BookNum = BookNum;
+        this.bookNum = bookNum;
+        this.borrower = borrower;
     }
 }
-class BorrowedBook{
-    int BookNum;
-    String Name;
-    String BorrowerId;
-    Book Books;
 
-    public BorrowedBook(int BookNum , String Name, String BorrowerId, Book Books) {
-        this.BookNum = BookNum;
-        this.Name = Name;
-        this.BorrowerId = BorrowerId;
-        this.Books= Books;
+class Borrower{
+    int borrowerId;
+    String borrowerName;
+
+    public Borrower(int borrowerId,  String borrowerName) {
+        this.borrowerId = borrowerId;
+        this.borrowerName = borrowerName;
     }
 }
+
 class Library {
     ArrayList<Book> books;
-    ArrayList<BorrowedBook> borrowedBooks;
+    ArrayList<Book> borrowedBooks;
+    ArrayList<Book> reservedBooks;
 
     public Library() {
         books = new ArrayList();
         borrowedBooks = new ArrayList();
+        reservedBooks = new ArrayList();
     }
 
-    public void addBorrowedBook(BorrowedBook BorrowedBook) {
-        borrowedBooks.add(BorrowedBook);
-        for (Book book: books ) {
-            if (BorrowedBook.BookNum == book.BookNum) {
-                books.remove(book);
-                break;
-            }
+    public void addBorrowedBook(Book book) {
+        var existingBook = getBook(book.bookNum, books);
+
+        if(existingBook != null){
+            addBook(existingBook, borrowedBooks);
+            books.remove(existingBook);
         }
-    }
-
-    public void removeBorrowedBook(int BookNum) {
         
-        for (BorrowedBook BorrowedBook: borrowedBooks ) {
-            if (BorrowedBook.BookNum == BookNum) {
-                books.add(BorrowedBook.Books);
-                borrowedBooks.remove(BorrowedBook);
-                break;
-            }
+    }
+
+    public void returnBorrowedBook(int bookNum) {
+        var existingBook = getBook(bookNum, borrowedBooks);
+
+        if(existingBook != null) {
+            addBook(existingBook, books);
+            borrowedBooks.remove(existingBook);
         }
     }
 
-    public void addBook(Book book) {
-        books.add(book);
+    public void addBook(Book book, ArrayList<Book> arrayOfBooks) {
+        arrayOfBooks.add(book);
     }
 
-    public void removeBook(int BookNum) {
-        for (Book book: books ) {
-            if (book.BookNum == BookNum) {
-                books.remove(book);
-                break;
-            }
+    public void removeBook(int bookNum, ArrayList<Book> arrayOfBooks) {
+        var existingBook = getBook(bookNum, books);
+
+        if(existingBook != null) {
+            arrayOfBooks.remove(existingBook);
         }
     }
 
-    public Book getBook(int BookNum) {
-        for (Book book: books ) {
-            if (book.BookNum == BookNum){
+    public Book getBook(int bookNum, ArrayList<Book> arrayOfBooks) {
+        for (Book book: arrayOfBooks ) {
+            if (book.bookNum == bookNum){
                 return book;
             }
         }
         return null;
     }
 
-
-    public void editBook(int BookNum, Book newBook) {
+    //Can only be editted in Books
+    public void editBook(int bookNum, Book newBook) {
         for (Book book: books ) {
-            if (book.BookNum == BookNum) {
+            if (book.bookNum == bookNum) {
                 book.author = newBook.author;
                 book.title = newBook.title;
             }
         }
     }
+
     public void displayBorrowedBooks() {
-        for (BorrowedBook BorrowedBook : borrowedBooks) {
-            System.out.println("Name: " + BorrowedBook.Name);
-            System.out.println("Borrowed Id: " + BorrowedBook.BorrowerId);
-            System.out.println("Book Number: " + BorrowedBook.BookNum);
+        for (Book book : borrowedBooks) {
+            System.out.println("Title: " + book.title);
+            System.out.println("Author: " + book.author);
+            System.out.println("Book Number: " + book.bookNum);
+            System.out.println("Book borrower: " + book.borrower.borrowerName);
             System.out.println();
         }
     }
@@ -98,7 +99,7 @@ class Library {
         for (Book book : books) {
             System.out.println("Title: " + book.title);
             System.out.println("Author: " + book.author);
-            System.out.println("Book Number: " + book.BookNum);
+            System.out.println("Book Number: " + book.bookNum);
             System.out.println();
         }
     }
@@ -116,7 +117,7 @@ public class Main
             System.out.println("Menu");
             System.out.println("[1] Display Books");
             System.out.println("[2] Add Book");
-            System.out.println("[3] Take Book");
+            System.out.println("[3] Borrow Book");
             System.out.println("[4] Return Book");
             System.out.println("[5] Remove book");
             System.out.println("[6] Edit Books");
@@ -163,17 +164,24 @@ public class Main
     {
         boolean bError = true;
         int choice = 0;
-        int BookNum = 0;
+        int bookNum = 0;
         Scanner scanner = new Scanner(System.in);
         Library library = new Library();
         
         do{
             choice = CheckChoice();
+            Book newBook;
+
             switch (choice)
             {
                 // Display Books
                 case 1:
                     System.out.println("============================================================================");
+                    if (library.books.isEmpty())
+                    {
+                        System.out.println("No Available Books, Please Add Books..");
+                        break;
+                    }
                     System.out.println("Here are the available Books.");
                     library.displayBooks();
                     
@@ -188,10 +196,11 @@ public class Main
                     String author = scanner.nextLine();
                     Book currentBook = null;
                     System.out.print("Enter Book Number: ");
-                    BookNum = CheckNumber();
+                    bookNum = CheckNumber();
 
                     System.out.println("Done...");
-                    library.addBook(new Book(title, author, BookNum));
+                    newBook = new Book(title, author, bookNum, null);
+                    library.addBook(newBook, library.books);
                     break;
                 // Take Books
                 case 3:
@@ -205,26 +214,32 @@ public class Main
                     System.out.println("Taking Books..");
                     library.displayBooks();
                     boolean cError = false;
-                    Book TakeBook = null;
-                    BookNum = 0;
+                    bookNum = 0;
+
                     do{
                         try{
-                        System.out.print("Enter Book Number to take:");
-                        BookNum = scanner.nextInt();
-                        TakeBook = library.getBook(BookNum);
-                        System.out.print("Please enter your name:");
-                        String name = scanner.nextLine();
-                        System.out.print("Pls enter your BorrowerId:");
-                        String borrowerId = scanner.nextLine();
-                        library.addBorrowedBook(new BorrowedBook(BookNum, name, borrowerId, TakeBook));
-                        cError = true;
+                            System.out.print("Enter Book Number to take:");
+                            bookNum = scanner.nextInt();
+
+                            Book book = library.getBook(bookNum, library.books);
+                            System.out.print("Please enter your name:");
+                            String borrowerName = scanner.next();
+                            System.out.print("Pls enter your borrowerId:");
+                            int borrowerId = scanner.nextInt();
+
+                            Borrower newBorrower = new Borrower(borrowerId, borrowerName);
+                            book.borrower = newBorrower;
+                            
+                            library.addBorrowedBook(book);
+                            cError = true;
                         }
                         catch(Exception e)
                         {
-                            System.out.println(BookNum + " is not applicable. Pls try again");
+                            System.out.println(bookNum + " is not applicable. Pls try again");
                         }
                         
-                        }while(cError == false);
+                    }while(cError == false);
+                    break;
 
 
                 // Return Books
@@ -233,7 +248,7 @@ public class Main
                     library.displayBorrowedBooks();
                     break;
 
-                // Delete
+                // Removing Books
                 case 5:
                     System.out.println("============================================================================");
                     if (library.books.isEmpty()){
@@ -243,13 +258,13 @@ public class Main
                     System.out.println("Remove Books\n");
                     library.displayBooks();
                     System.out.print("Enter Book Number: ");
-                    BookNum = scanner.nextInt();
-                    library.removeBook(BookNum);
+                    bookNum = scanner.nextInt();
+                    library.removeBook(bookNum, library.books);
                     break;
-                // Exit
+                // Edit
                 case 6:
                     currentBook = null;
-                    BookNum = 0;
+                    bookNum = 0;
                     System.out.println("============================================================================");
                     if (library.books.isEmpty()){
                         System.out.println("Currently No Available Books, Please Go to Add Books..");
@@ -261,10 +276,10 @@ public class Main
                         try{
                         System.out.println("Current Available Books:\n");
                         library.displayBooks();
-                        System.out.println("Enter Book Number to take:      (Type 'Menu' to go back to the menu.. )");
-                        BookNum = scanner.nextInt();
+                        System.out.println("Enter Book Number to take:");
+                        bookNum = scanner.nextInt();
 
-                        currentBook = library.getBook(BookNum);
+                        currentBook = library.getBook(bookNum, library.books);
                         if (currentBook == null)
                             {
                             System.out.println("============================================================================");
@@ -272,29 +287,25 @@ public class Main
                         }
                         catch(Exception e)
                         {
-                            System.out.println(BookNum + " is not applicable. Pls try again");
+                            System.out.println(bookNum + " is not applicable. Pls try again");
                         }
 
                     }while(currentBook == null);
-                    System.out.println("You have Selected Book Number:"+currentBook.BookNum);
+                    System.out.println("You have Selected Book Number:"+currentBook.bookNum);
                     System.out.println("Title: " + currentBook.title);
                     System.out.println("Author: " + currentBook.author);
-                    System.out.println("Book Number: " + currentBook.BookNum);
+                    System.out.println("Book Number: " + currentBook.bookNum);
                     System.out.println();
                     
                     System.out.print("Enter New title: ");
                     title = scanner.nextLine();
                     System.out.print("Enter New author: ");
                     author = scanner.nextLine();
-                    Book newBook = new Book(title, author, BookNum);
-                    library.editBook(BookNum, newBook);
-
-                    //System.out.println("Enter Book Number: ");
-                    //BookNum = scanner.nextLine();
-                    //library.getBook(BookNum);
+                    newBook = new Book(title, author, bookNum, null);
+                    library.editBook(bookNum, newBook);
                     break;
                 // Exit
-                default:
+                case 10:
                     System.out.println("Thank you, for you cooperation.");
                     bError = false;
                     break;
