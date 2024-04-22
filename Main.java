@@ -1,43 +1,75 @@
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
 class Book {
     String title;
     String author;
-    String BookNum;
-    Boolean availability;
+    int BookNum;
 
-    public Book(String title, String author, String BookNum, Boolean availability) {
+    public Book(String title, String author, int BookNum) {
         this.title = title;
         this.author = author;
         this.BookNum = BookNum;
-        this.availability = availability;
     }
 }
+class BorrowedBook{
+    int BookNum;
+    String Name;
+    String BorrowerId;
+    Book Books;
 
+    public BorrowedBook(int BookNum , String Name, String BorrowerId, Book Books) {
+        this.BookNum = BookNum;
+        this.Name = Name;
+        this.BorrowerId = BorrowerId;
+        this.Books= Books;
+    }
+}
 class Library {
     ArrayList<Book> books;
+    ArrayList<BorrowedBook> borrowedBooks;
 
     public Library() {
         books = new ArrayList();
+        borrowedBooks = new ArrayList();
     }
 
-    public void addBook(Book book) {
-        books.add(book);
-    }
-
-    public void removeBook(String BookNum) {
+    public void addBorrowedBook(BorrowedBook BorrowedBook) {
+        borrowedBooks.add(BorrowedBook);
         for (Book book: books ) {
-            if (book.BookNum.equals(BookNum)) {
+            if (BorrowedBook.BookNum == book.BookNum) {
                 books.remove(book);
                 break;
             }
         }
     }
 
-    public Book getBook(String BookNum) {
+    public void removeBorrowedBook(int BookNum) {
+        
+        for (BorrowedBook BorrowedBook: borrowedBooks ) {
+            if (BorrowedBook.BookNum == BookNum) {
+                books.add(BorrowedBook.Books);
+                borrowedBooks.remove(BorrowedBook);
+                break;
+            }
+        }
+    }
+
+    public void addBook(Book book) {
+        books.add(book);
+    }
+
+    public void removeBook(int BookNum) {
         for (Book book: books ) {
-            if (book.BookNum.equals(BookNum)) {
+            if (book.BookNum == BookNum) {
+                books.remove(book);
+                break;
+            }
+        }
+    }
+
+    public Book getBook(int BookNum) {
+        for (Book book: books ) {
+            if (book.BookNum == BookNum){
                 return book;
             }
         }
@@ -45,50 +77,36 @@ class Library {
     }
 
 
-    public void editBook(String BookNum, Book newBook) {
+    public void editBook(int BookNum, Book newBook) {
         for (Book book: books ) {
-            if (book.BookNum.equals(BookNum)) {
+            if (book.BookNum == BookNum) {
                 book.author = newBook.author;
                 book.title = newBook.title;
-                book.availability = newBook.availability;
             }
+        }
+    }
+    public void displayBorrowedBooks() {
+        for (BorrowedBook BorrowedBook : borrowedBooks) {
+            System.out.println("Name: " + BorrowedBook.Name);
+            System.out.println("Borrowed Id: " + BorrowedBook.BorrowerId);
+            System.out.println("Book Number: " + BorrowedBook.BookNum);
+            System.out.println();
         }
     }
 
     public void displayBooks() {
         for (Book book : books) {
-            String available = "No";
             System.out.println("Title: " + book.title);
             System.out.println("Author: " + book.author);
             System.out.println("Book Number: " + book.BookNum);
-            if (book.availability == true){
-                available = "Yes";
-            }
-            System.out.println("Accessible: " + available);
             System.out.println();
         }
-    }
-    public boolean availableBooks()
-    {
-        for (Book book : books)
-        {
-            if (book.availability == true)
-            {
-                System.out.println("Title: " + book.title);
-                System.out.println("Author: " + book.author);
-                System.out.println("Book Number: " + book.BookNum);
-                String available = "Yes";
-                System.out.println("Accessible: " + available);
-                System.out.println();
-            }
-        }
-        return true;
     }
 }
 
 public class Main
 {
-    public static int IdentifyNumber() {
+    public static int CheckChoice() {
         Scanner scanner = new Scanner(System.in);
         int x = 0;
 
@@ -120,16 +138,37 @@ public class Main
             }
         }
     }
+    public static int CheckNumber() {
+        Scanner scanner = new Scanner(System.in);
+        int x = 0;
+
+        while (true)
+        {
+            String input = scanner.nextLine();
+            try {
+                x = Integer.parseInt(input);
+                if (x > 0){
+                    return x;
+                }
+                else
+                {
+                    System.out.println(input + " is not within the range.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(input + " is not a number. Pls try again");
+            }
+        }
+    }
     public static void main(String[] args)
     {
         boolean bError = true;
         int choice = 0;
-        String BookNum;
+        int BookNum = 0;
         Scanner scanner = new Scanner(System.in);
         Library library = new Library();
         
         do{
-            choice = IdentifyNumber();
+            choice = CheckChoice();
             switch (choice)
             {
                 // Display Books
@@ -147,43 +186,38 @@ public class Main
                     String title = scanner.nextLine();
                     System.out.print("Enter author: ");
                     String author = scanner.nextLine();
-
+                    Book currentBook = null;
                     System.out.print("Enter Book Number: ");
-                    BookNum = scanner.nextLine();
-                    Boolean availability = true;
+                    BookNum = CheckNumber();
 
                     System.out.println("Done...");
-                    library.addBook(new Book(title, author, BookNum, availability));
+                    library.addBook(new Book(title, author, BookNum));
                     break;
                 // Take Books
                 case 3:
                     System.out.println("============================================================================");
-                    if (library.books.isEmpty()|| library.availableBooks() == false)
+                    if (library.books.isEmpty())
                     {
                         System.out.println("No Available Books, Please Add Books..");
                         break;
                     }
 
                     System.out.println("Taking Books..");
+                    library.displayBooks();
                     boolean cError = false;
                     Book TakeBook = null;
-                    BookNum = null;
+                    BookNum = 0;
                     do{
                         try{
-                        library.availableBooks();
-                        System.out.println("Enter Book Number to take:      (Type 'Menu' to go back to the menu.. )");
-                        BookNum = scanner.nextLine();
+                        System.out.print("Enter Book Number to take:");
+                        BookNum = scanner.nextInt();
                         TakeBook = library.getBook(BookNum);
-                        if (TakeBook.availability == false)
-                            {
-                            System.out.println("============================================================================");
-                            System.out.println("This book has already been taken..\n");
-                            }
-                        else if (BookNum.toLowerCase() == "menu"|| TakeBook.availability == true)
-                        {
-                            cError = true;
-                            break;
-                        }
+                        System.out.print("Please enter your name:");
+                        String name = scanner.nextLine();
+                        System.out.print("Pls enter your BorrowerId:");
+                        String borrowerId = scanner.nextLine();
+                        library.addBorrowedBook(new BorrowedBook(BookNum, name, borrowerId, TakeBook));
+                        cError = true;
                         }
                         catch(Exception e)
                         {
@@ -191,18 +225,12 @@ public class Main
                         }
                         
                         }while(cError == false);
-                        if (library.availableBooks() == false || BookNum.toLowerCase() == "menu")
-                        {
-                            break;
-                        }
-                        Boolean available = false;
-                        Book newBook = new Book(TakeBook.title, TakeBook.author, TakeBook.BookNum, available);
-                        library.editBook(BookNum, newBook);
-                        
+
 
                 // Return Books
                 case 4:
-                    System.out.println(":");
+                    System.out.println("Returning Books..");
+                    library.displayBorrowedBooks();
                     break;
 
                 // Delete
@@ -215,16 +243,16 @@ public class Main
                     System.out.println("Remove Books\n");
                     library.displayBooks();
                     System.out.print("Enter Book Number: ");
-                    BookNum = scanner.nextLine();
+                    BookNum = scanner.nextInt();
                     library.removeBook(BookNum);
                     break;
                 // Exit
                 case 6:
-                    Book currentBook = null;
-                    BookNum = null;
+                    currentBook = null;
+                    BookNum = 0;
                     System.out.println("============================================================================");
                     if (library.books.isEmpty()){
-                        System.out.println("Currently No Available Books..");
+                        System.out.println("Currently No Available Books, Please Go to Add Books..");
                         break;
                     }
                     System.out.println("Editing...");
@@ -234,7 +262,7 @@ public class Main
                         System.out.println("Current Available Books:\n");
                         library.displayBooks();
                         System.out.println("Enter Book Number to take:      (Type 'Menu' to go back to the menu.. )");
-                        BookNum = scanner.nextLine();
+                        BookNum = scanner.nextInt();
 
                         currentBook = library.getBook(BookNum);
                         if (currentBook == null)
@@ -252,15 +280,13 @@ public class Main
                     System.out.println("Title: " + currentBook.title);
                     System.out.println("Author: " + currentBook.author);
                     System.out.println("Book Number: " + currentBook.BookNum);
-                    System.out.println("Accessible: " + currentBook.availability);
                     System.out.println();
                     
                     System.out.print("Enter New title: ");
                     title = scanner.nextLine();
                     System.out.print("Enter New author: ");
                     author = scanner.nextLine();
-                    availability = true;
-                    newBook = new Book(title, author, BookNum, availability);
+                    Book newBook = new Book(title, author, BookNum);
                     library.editBook(BookNum, newBook);
 
                     //System.out.println("Enter Book Number: ");
