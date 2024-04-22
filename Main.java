@@ -114,13 +114,13 @@ public class Main
         {
             System.out.println("============================================================================");
             System.out.println("Menu");
-            System.out.println("(1)Display Books");
-            System.out.println("(2)Add Book");
-            System.out.println("(3)Take Book");
-            System.out.println("(4)Return Book");
-            System.out.println("(5)Remove book");
-            System.out.println("(6)Edit Books");
-            System.out.println("(7)Exit");
+            System.out.println("[1] Display Books");
+            System.out.println("[2] Add Book");
+            System.out.println("[3] Take Book");
+            System.out.println("[4] Return Book");
+            System.out.println("[5] Remove book");
+            System.out.println("[6] Edit Books");
+            System.out.println("[7] Exit");
             System.out.print(":");
             String input = scanner.nextLine();
 
@@ -131,7 +131,7 @@ public class Main
                 }
                 else
                 {
-                    System.out.println(input + " is not within the range.");
+                    System.out.println(input + " is not an option. Please pick between options 1-7.");
                 }
             } catch (NumberFormatException e) {
                 System.out.println(input + " is not a number. Pls try again");
@@ -174,7 +174,7 @@ public class Main
                 // Display Books
                 case 1:
                     System.out.println("============================================================================");
-                    System.out.println("Here are the Books available.");
+                    System.out.println("Here are the available Books.");
                     library.displayBooks();
                     
                     break;
