@@ -121,7 +121,10 @@ public class Main
             System.out.println("[4] Return Book");
             System.out.println("[5] Remove book");
             System.out.println("[6] Edit Books");
-            System.out.println("[7] Exit");
+            System.out.println("[7] Return Book");
+            System.out.println("[8] Display reserve books");
+            System.out.println("[9] Reserve a book");    
+            System.out.println("[10] Exit");
             System.out.print(":");
             String input = scanner.nextLine();
 
@@ -132,7 +135,7 @@ public class Main
                 }
                 else
                 {
-                    System.out.println(input + " is not an option. Please pick between options 1-7.");
+                    System.out.println(input + " is not an option. Please pick between options 1-10.");
                 }
             } catch (NumberFormatException e) {
                 System.out.println(input + " is not a number. Pls try again");
