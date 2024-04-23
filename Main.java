@@ -186,7 +186,7 @@ public class Main
                 }
                 else
                 {
-                    System.out.println(input + " is not within the range.");
+                    System.out.println(input + " is not an option. Please pick between options 1-10.");
                 }
             } catch (NumberFormatException e) {
                 System.out.println(input + " is not a number. Pls try again");
@@ -375,7 +375,7 @@ public class Main
                     break;
 
 
-                // Return a Book
+                // Return a Book | Done
                 case 7:
                     
                     System.out.println("============================================================================");
@@ -394,7 +394,7 @@ public class Main
                         bookNum = checkNumber();
                     }
                     
-                    // Add a checking here if the bookNum exists
+                    // Add a checking here if the bookNum exists | Done
                     book = library.getBook(bookNum);
                     status = "Available";
                     
@@ -419,7 +419,7 @@ public class Main
                     
                     break;
                     
-                // Reserve a Book
+                // Reserve a Book | Done
                 case 9:
                     System.out.println("============================================================================");
                     if (allBooks.isEmpty())
@@ -454,7 +454,7 @@ public class Main
                     System.out.println("Going back to menu..");
                     break;
 
-                // Exit
+                // Exit | Done
                 case 10:
                     System.out.println("Thank you, for you cooperation.");
                     bError = false;
