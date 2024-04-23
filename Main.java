@@ -5,12 +5,14 @@ class Book {
     String author;
     int bookNum;
     Borrower borrower;
+    String status;
 
-    public Book(String title, String author, int bookNum, Borrower borrower) {
+    public Book(String title, String author, int bookNum, Borrower borrower, String status) {
         this.title = title;
         this.author = author;
         this.bookNum = bookNum;
         this.borrower = borrower;
+        this.status = status;
     }
 }
 
@@ -26,88 +28,149 @@ class Borrower{
 
 class Library {
     ArrayList<Book> books;
-    ArrayList<Book> borrowedBooks;
-    ArrayList<Book> reservedBooks;
 
     public Library() {
         books = new ArrayList();
-        borrowedBooks = new ArrayList();
-        reservedBooks = new ArrayList();
     }
 
-    public void addBorrowedBook(Book book) {
-        var existingBook = getBook(book.bookNum, books);
+    // public void addBorrowedBook(Book book) {
+    //     var existingBook = getBook(book.bookNum);
 
-        if(existingBook != null){
-            addBook(existingBook, borrowedBooks);
-            books.remove(existingBook);
-        }
-        
-    }
+    //     if(existingBook != null){
+    //         addBook(existingBook, books);
+    //         books.remove(existingBook);
+    //     }
+    // }
 
-    public void returnBorrowedBook(int bookNum) {
-        var existingBook = getBook(bookNum, borrowedBooks);
+    // public void returnBorrowedBook(int bookNum) {
+    //     var existingBook = getBook(bookNum);
 
-        if(existingBook != null) {
-            addBook(existingBook, books);
-            borrowedBooks.remove(existingBook);
-        }
-    }
+    //     if(existingBook != null) {
+    //         addBook(existingBook, books);
+    //         books.remove(existingBook);
+    //     }
+    // }
 
     public void addBook(Book book, ArrayList<Book> arrayOfBooks) {
-        arrayOfBooks.add(book);
+        if(!isBookExisting(book.bookNum)){
+            arrayOfBooks.add(book);
+        }
     }
 
     public void removeBook(int bookNum, ArrayList<Book> arrayOfBooks) {
-        var existingBook = getBook(bookNum, books);
+        var existingBook = getBook(bookNum);
 
         if(existingBook != null) {
             arrayOfBooks.remove(existingBook);
         }
     }
 
-    public Book getBook(int bookNum, ArrayList<Book> arrayOfBooks) {
-        for (Book book: arrayOfBooks ) {
+    public Book getBook(int bookNum) {
+        for (Book book: books ) {
             if (book.bookNum == bookNum){
                 return book;
             }
         }
+        
         return null;
     }
 
-    //Can only be editted in Books
-    public void editBook(int bookNum, Book newBook) {
+    public boolean isBookExisting (int bookNum) {
+        for (Book book: books ) {
+            if (book.bookNum == bookNum){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void editBook(int bookNum, Book newBook, String status) {
         for (Book book: books ) {
             if (book.bookNum == bookNum) {
                 book.author = newBook.author;
                 book.title = newBook.title;
+                book.status = status;
             }
         }
     }
+    // public void displayReservedBooks() {
+    //     for (Book book : books) {
+    //         if (book.status == "Reserved") {
+    //             System.out.println("Title: " + book.title);
+    //             System.out.println("Author: " + book.author);
+    //             System.out.println("Book Number: " + book.bookNum);
+    //             System.out.println("Book borrower: " + book.borrower.borrowerName);
+    //             System.out.println("status: " + book.status);
+    //             System.out.println();
+    //         }
+    //     }
+    // }
 
-    public void displayBorrowedBooks() {
-        for (Book book : borrowedBooks) {
-            System.out.println("Title: " + book.title);
-            System.out.println("Author: " + book.author);
-            System.out.println("Book Number: " + book.bookNum);
-            System.out.println("Book borrower: " + book.borrower.borrowerName);
-            System.out.println();
-        }
-    }
+    // public void displayBorrowedBooks() {
+    //     for (Book book : books) {
+    //         if (book.status == "Borrowed") {
+    //             System.out.println("Title: " + book.title);
+    //             System.out.println("Author: " + book.author);
+    //             System.out.println("Book Number: " + book.bookNum);
+    //             System.out.println("Book borrower: " + book.borrower.borrowerName);
+    //             System.out.println("status: " + book.status);
+    //             System.out.println();
+    //         }
+    //     }
+    // }
 
-    public void displayBooks() {
+    public void displayBooks(String status) {
         for (Book book : books) {
-            System.out.println("Title: " + book.title);
-            System.out.println("Author: " + book.author);
-            System.out.println("Book Number: " + book.bookNum);
-            System.out.println();
+            if (book.status == status) {
+                System.out.println("Title: " + book.title);
+                System.out.println("Author: " + book.author);
+                System.out.println("Book Number: " + book.bookNum);
+                if (book.status == ("Borrowed") || book.status == ("Reserved")){
+                    System.out.println("Book borrower: " + book.borrower.borrowerName);
+                    System.out.println("BorrowerId: " + book.borrower.borrowerId);
+                }
+                System.out.println("status: " + book.status);
+                System.out.println();
+            }
         }
+        
+    }
+    public ArrayList<Book> getReservedBooks() {
+        ArrayList<Book> reservedBooks = new ArrayList<Book>();
+        for (Book book : books) {
+            if (book.status == "Reserved") {
+                reservedBooks.add(book);
+            }
+        }
+
+        return reservedBooks;
+    }
+    public ArrayList<Book> getBorrowedBooks() {
+        ArrayList<Book> borrowedBooks = new ArrayList<Book>();
+        for (Book book : books) {
+            if (book.status == "Borrowed") {
+                borrowedBooks.add(book);
+            }
+        }
+
+        return borrowedBooks;
+    }
+    public ArrayList<Book> getAvailableBooks() {
+        ArrayList<Book> availableBooks = new ArrayList<Book>();
+        for (Book book : books) {
+            if (book.status == "Available") {
+                availableBooks.add(book);
+            }
+        }
+
+        return availableBooks;
     }
 }
 
 public class Main
 {
-    public static int CheckChoice() {
+    public static int checkChoice() {
         Scanner scanner = new Scanner(System.in);
         int x = 0;
 
@@ -117,11 +180,14 @@ public class Main
             System.out.println("Menu");
             System.out.println("[1] Display Books");
             System.out.println("[2] Add Book");
-            System.out.println("[3] Borrow Book");
-            System.out.println("[4] Return Book");
-            System.out.println("[5] Remove book");
-            System.out.println("[6] Edit Books");
-            System.out.println("[7] Exit");
+            System.out.println("[3] Edit Books");
+            System.out.println("[4] Remove book");
+            System.out.println("[5] Display Borrowed");
+            System.out.println("[6] Borrow Book");
+            System.out.println("[7] Return Book");
+            System.out.println("[8] Display reserve books");
+            System.out.println("[9] Reserve a book");
+            System.out.println("[10] Exit");
             System.out.print(":");
             String input = scanner.nextLine();
 
@@ -132,19 +198,20 @@ public class Main
                 }
                 else
                 {
-                    System.out.println(input + " is not an option. Please pick between options 1-7.");
+                    System.out.println(input + " is not an option. Please pick between options 1-10.");
                 }
             } catch (NumberFormatException e) {
                 System.out.println(input + " is not a number. Pls try again");
             }
         }
     }
-    public static int CheckNumber() {
+    public static int checkNumber() {
         Scanner scanner = new Scanner(System.in);
         int x = 0;
 
         while (true)
         {
+            System.out.print(":");
             String input = scanner.nextLine();
             try {
                 x = Integer.parseInt(input);
@@ -162,107 +229,65 @@ public class Main
     }
     public static void main(String[] args)
     {
-        boolean bError = true;
+        Book book = null;
+        boolean bError = false;
         int choice = 0;
         int bookNum = 0;
         Scanner scanner = new Scanner(System.in);
         Library library = new Library();
-        
+        ArrayList<Book> reservedBooks = library.getReservedBooks();
+        ArrayList<Book> availableBooks = library.getAvailableBooks();
+        ArrayList<Book> borrowedBooks = library.getBorrowedBooks();
         do{
-            choice = CheckChoice();
+            choice = checkChoice();
             Book newBook;
 
             switch (choice)
             {
-                // Display Books
+                // Display Books | Done
                 case 1:
                     System.out.println("============================================================================");
-                    if (library.books.isEmpty())
+                    availableBooks = library.getAvailableBooks();
+                    if (library.books.isEmpty() || availableBooks.isEmpty())
                     {
                         System.out.println("No Available Books, Please Add Books..");
                         break;
                     }
                     System.out.println("Here are the available Books.");
-                    library.displayBooks();
+                    library.displayBooks("Available");
                     
                     break;
-                // Add Books
+                // Add Books | Done
                 case 2:
                     System.out.println("============================================================================");
                     System.out.println("Adding book..");
+
                     System.out.print("Enter title: ");
                     String title = scanner.nextLine();
                     System.out.print("Enter author: ");
                     String author = scanner.nextLine();
                     Book currentBook = null;
-                    System.out.print("Enter Book Number: ");
-                    bookNum = CheckNumber();
 
-                    System.out.println("Done...");
-                    newBook = new Book(title, author, bookNum, null);
-                    library.addBook(newBook, library.books);
-                    break;
-                // Take Books
-                case 3:
-                    System.out.println("============================================================================");
-                    if (library.books.isEmpty())
-                    {
-                        System.out.println("No Available Books, Please Add Books..");
-                        break;
-                    }
-
-                    System.out.println("Taking Books..");
-                    library.displayBooks();
-                    boolean cError = false;
-                    bookNum = 0;
-
-                    do{
-                        try{
-                            System.out.print("Enter Book Number to take:");
-                            bookNum = scanner.nextInt();
-
-                            Book book = library.getBook(bookNum, library.books);
-                            System.out.print("Please enter your name:");
-                            String borrowerName = scanner.next();
-                            System.out.print("Pls enter your borrowerId:");
-                            int borrowerId = scanner.nextInt();
-
-                            Borrower newBorrower = new Borrower(borrowerId, borrowerName);
-                            book.borrower = newBorrower;
-                            
-                            library.addBorrowedBook(book);
-                            cError = true;
-                        }
-                        catch(Exception e)
-                        {
-                            System.out.println(bookNum + " is not applicable. Pls try again");
-                        }
+                    while(true) {
+                        System.out.println("Enter Book Number");
+                        bookNum = checkNumber();
                         
-                    }while(cError == false);
-                    break;
-
-
-                // Return Books
-                case 4:
-                    System.out.println("Returning Books..");
-                    library.displayBorrowedBooks();
-                    break;
-
-                // Removing Books
-                case 5:
-                    System.out.println("============================================================================");
-                    if (library.books.isEmpty()){
-                        System.out.println("Currently No Available Books, Please Go to Add Books..");
-                        break;
+                        String status = "Available";
+                        
+                        newBook = new Book(title, author, bookNum, null, status);
+                        if (!library.isBookExisting(bookNum)){
+                            System.out.println("Done...");
+                            library.addBook(newBook, library.books);
+                            break;
+                        }
+                        else{
+                            System.out.println("Book number already exist, please try again..");
+                        }
                     }
-                    System.out.println("Remove Books\n");
-                    library.displayBooks();
-                    System.out.print("Enter Book Number: ");
-                    bookNum = scanner.nextInt();
-                    library.removeBook(bookNum, library.books);
                     break;
-                // Edit
-                case 6:
+
+                // Edit | Done
+                case 3:
                     currentBook = null;
                     bookNum = 0;
                     System.out.println("============================================================================");
@@ -275,11 +300,11 @@ public class Main
                     do{
                         try{
                         System.out.println("Current Available Books:\n");
-                        library.displayBooks();
+                        library.displayBooks("Available");
                         System.out.println("Enter Book Number to take:");
                         bookNum = scanner.nextInt();
 
-                        currentBook = library.getBook(bookNum, library.books);
+                        currentBook = library.getBook(bookNum);
                         if (currentBook == null)
                             {
                             System.out.println("============================================================================");
@@ -301,9 +326,163 @@ public class Main
                     title = scanner.nextLine();
                     System.out.print("Enter New author: ");
                     author = scanner.nextLine();
-                    newBook = new Book(title, author, bookNum, null);
-                    library.editBook(bookNum, newBook);
+                    newBook = new Book(title, author, bookNum, null, currentBook.status);
+                    library.editBook(bookNum, newBook, currentBook.status);
+                    System.out.println("Done...");
                     break;
+                    // Removing Books | Done
+                case 4:
+                System.out.println("============================================================================");
+                if (library.books.isEmpty()){
+                    System.out.println("Currently No Available Books, Please Go to Add Books..");
+                    break;
+                }
+                System.out.println("Remove Books\n");
+                library.displayBooks("Available");
+                System.out.print("Enter Book Number: ");
+                bookNum = scanner.nextInt();
+                book = library.getBook(bookNum);
+                System.out.println("The Book"+ book +"has been Removed..");
+                library.removeBook(bookNum, library.books);
+                System.out.println("Going back to menu..");
+                break;
+
+                // Display Borrowed Books | Done
+                case 5:
+                    System.out.println("============================================================================");
+                    borrowedBooks = library.getBorrowedBooks();
+                    if (library.books.isEmpty() || borrowedBooks.isEmpty())
+                    {
+                        System.out.println("No Available Books, Please Add Books..");
+                        break;
+                    }
+                    System.out.println("Here are the Borrowed Books.");
+                    library.displayBooks("Borrowed");
+                
+                break;
+
+                    // Borrow Books | Done
+                case 6:
+                    System.out.println("============================================================================");
+                    if (library.books.isEmpty())
+                    {
+                        System.out.println("No Available Books, Please Add Books..");
+                        break;
+                    }
+
+                    System.out.println("Taking Books..");
+                    library.displayBooks("Available");
+                    int borrowerId = 0;
+                    bookNum = 0;
+
+                            System.out.println("Enter Book Number to take");
+                            bookNum = checkNumber();
+
+                            book = library.getBook(bookNum);
+                            System.out.print("Please enter your name:");
+                            String borrowerName = scanner.next();
+
+                            System.out.println("Pls enter your borrowerId:");
+                            borrowerId = checkNumber();
+
+                            Borrower newBorrower = new Borrower(borrowerId, borrowerName);
+                            book.borrower = newBorrower;
+                            String status = "Borrowed";
+                            
+                            newBook = new Book(book.title, book.author, bookNum, newBorrower, status);
+                            library.editBook(bookNum, newBook, status);
+                            library.addBook(book,library.books);
+                        
+                    System.out.println("The Book has been Borrowed..");
+                    System.out.println("Going back to menu..");
+                    break;
+
+
+                // Return Books
+                case 7:
+                    
+                    System.out.println("============================================================================");
+                    if (library.books.isEmpty())
+                    {
+                        System.out.println("No Available Books, Please Add Books..");
+                        break;
+                    }
+                    else if (reservedBooks.isEmpty())
+                    {
+                    System.out.println("No Reserved Books, Please go to Reserve Books..");
+                    break;
+                    }
+                    System.out.println("Returning Books..");
+                    library.displayBooks("Borrowed");
+
+                            System.out.println("Enter Book Number to return");
+                            bookNum = checkNumber();
+
+                            book = library.getBook(bookNum);
+                            status = "Available";
+                            
+                            newBook = new Book(book.title, book.author, bookNum, null, status);
+                            library.editBook(bookNum, newBook, status);
+                            library.addBook(book,library.books);
+                        
+                    System.out.println("The Book has been Returned..");
+                    System.out.println("Going back to menu..");
+                    break;
+                    
+                // Display Reserved Books | Done
+                case 8:
+                    System.out.println("============================================================================");
+                    reservedBooks = library.getReservedBooks();
+                    if (library.books.isEmpty()|| reservedBooks.isEmpty())
+                    {
+                        System.out.println("No Available Books, Please Add Books..");
+                        break;
+                    }
+                    else if (reservedBooks.isEmpty())
+                    {
+                    System.out.println("No Reserved Books, Please go to Reserve Books..");
+                    break;
+                    }
+                    System.out.println("Here are the Reserved Books.");
+                    library.displayBooks("Reserved");
+                    
+                    break;
+                    
+                // Reserve Book
+                case 9:System.out.println("============================================================================");
+                reservedBooks = library.getReservedBooks();
+                if (library.books.isEmpty())
+                {
+                    System.out.println("No Available Books, Please Add Books..");
+                    break;
+                }
+                System.out.println("Reserving Books..");
+                library.displayBooks("Available");
+                borrowerId = 0;
+                bookNum = 0;
+
+                        System.out.println("Enter Book Number to take");
+                        bookNum = checkNumber();
+
+                        book = library.getBook(bookNum);
+                        System.out.print("Please enter your name:");
+                        borrowerName = scanner.next();
+
+                        System.out.println("Pls enter your borrowerId:");
+                        borrowerId = checkNumber();
+
+                        newBorrower = new Borrower(borrowerId, borrowerName);
+                        book.borrower = newBorrower;
+                        status = "Reserved";
+                        
+                        newBook = new Book(book.title, book.author, bookNum, newBorrower, status);
+                        library.editBook(bookNum, newBook, status);
+                        library.addBook(book,library.books);
+                
+                System.out.println("The Book has been reserved..");
+                System.out.println("Going back to menu..");
+                break;
+
                 // Exit
                 case 10:
                     System.out.println("Thank you, for you cooperation.");
